@@ -3,10 +3,11 @@
 # load packages
 begin
   using MindReader
-  using HiddenMarkovModelReaders
-
   using DelimitedFiles
 end;
+
+# manual imports
+import HiddenMarkovModelReaders: setup, process!, HMM, HMMParams, euclDist, amplitude
 
 ################################################################################
 
