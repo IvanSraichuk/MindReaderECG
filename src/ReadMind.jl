@@ -26,6 +26,11 @@ include("Utilities/argParser.jl");
 
 ################################################################################
 
+# patch process
+include("processPatch.jl")
+
+################################################################################
+
 # load parameters
 include(
   string(shArgs["paramsDir"], shArgs["params"]),
