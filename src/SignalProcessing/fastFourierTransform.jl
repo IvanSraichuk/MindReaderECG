@@ -51,9 +51,8 @@ function extractFFT(channel::Array; binSize::T, binOverlap::T) where T <: Number
         channel[signalSteps[ι]:signalBoundry];
         zeros(binSize)
       ]
-
     # adjust last bin
-    elseif signalBoundry > length(channel)
+    else
       channelExtract = [
         channel[signalSteps[ι]:end];
         (signalBoundry - length(channel) |> abs |> zeros);
@@ -65,7 +64,6 @@ function extractFFT(channel::Array; binSize::T, binOverlap::T) where T <: Number
     fftChannel = fft(channelExtract)
     realFft = abs.(fftChannel)
     freqAr[ι, :] = realFft[1:binSize]
-
   end
   return freqAr
 end

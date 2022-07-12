@@ -3,11 +3,10 @@
 # load packages
 begin
   using MindReader
+  using HiddenMarkovModelReaders
   using DelimitedFiles
+  using DataFrames
 end;
-
-# manual imports
-import HiddenMarkovModelReaders: setup, process!, HMM, HMMParams, euclDist, amplitude
 
 ################################################################################
 
@@ -26,20 +25,15 @@ include("Utilities/argParser.jl");
 
 ################################################################################
 
-# patch process
-include("processPatch.jl")
-
-################################################################################
-
 # load parameters
 include(
-  string(shArgs["paramsDir"], shArgs["params"]),
+  string(shArgs["params"]),
 )
 
 ################################################################################
 
 # include additional protocols
-if haskey(shArgs, "additional") && haskey(shArgs, "addDir")
+#=if haskey(shArgs, "additional") && haskey(shArgs, "addDir")
   for ι in split(shArgs["additional"], ",")
     include(
       string(shArgs["addDir"], ι),
@@ -55,19 +49,23 @@ if haskey(shArgs, "annotation") && haskey(shArgs, "annotDir")
     string(shArgs["annotDir"], shArgs["annotation"]),
   )
 end
-
+=#
 ################################################################################
 
 #  read data
 begin
   # read edf file
-  edfDf, startTime, recordFreq = getSignals(shArgs)
-
+  filePath = shArgs["inputDir"] * shArgs["input"]
+  print(filePath)
+ 
+  ar = readdlm(filePath, Float64)
+  df = DataFrame(ar, :auto)
+  freqDc = extractFFT(df, binSize = 256, binOverlap = 4)
   # calculate fft
-  freqDc = extractFFT(edfDf, shArgs)
+  #freqDc = extractFFT(edfDf, shArgs)
 
   # calibrate annotations
-  if haskey(annotFile, replace(shArgs["input"], ".edf" => ""))
+  #=if haskey(annotFile, replace(shArgs["input"], ".edf" => ""))
     labelAr = annotationCalibrator(
       annotFile[replace(shArgs["input"], ".edf" => "")];
       startTime = startTime,
@@ -75,7 +73,7 @@ begin
       signalLength = size(edfDf, 1),
       shParams = shArgs,
     )
-  end
+  end=#
 end;
 
 ################################################################################
@@ -88,7 +86,7 @@ begin
 
   for (κ, υ) in freqDc
 
-    print()
+    print("Train model\n")
     @info κ
 
     #  build & train autoencoder

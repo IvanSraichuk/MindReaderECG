@@ -49,9 +49,8 @@ function extractSignalBin(channel::Array; binSize::T, binOverlap::T) where T <: 
     # extract signals
     if signalBoundry <= length(channel)
       signalAr[stepIx, :] = channel[signalSteps[stepIx]:signalBoundry]
-
     # adjust last bin
-    elseif signalBoundry > length(channel)
+    else
       signalAr[stepIx, :] = [
         channel[signalSteps[stepIx]:end];
         (signalBoundry - length(channel) |> abs |> zeros)
